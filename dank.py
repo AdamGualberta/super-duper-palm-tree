@@ -1,5 +1,6 @@
 
 import string
+import random
 
 class gameboard(object):
    """ 7 columns, 6 rows """
@@ -12,17 +13,22 @@ class gameboard(object):
                      [' ',' ',' ',' ',' ',' '],
                      [' ',' ',' ',' ',' ',' ']]
       self.moveNumber = 0
+      self.rowCount = [0,0,0,0,0,0,0]
       """gameboard board is stored here in the form of a list of lists.
          the inner lists are teh columns.
          it goes board[column[row]] """
 
    def updateBoard(self,move,player):
-      self.moveNumber += 1
-      for i in range(0,6):
-         if self.board[move][i] == ' ':
-            self.board[move][i] = player.getToken()
-            break
-      self.displayBoard()
+      if self.validMove(move) == 0:
+         self.displayBoard()
+         self.updateBoard(player.Turn(),player)
+      else:
+         self.moveNumber += 1
+         for i in range(0,6):
+            if self.board[move][i] == ' ':
+               self.board[move][i] = player.getToken()
+               break
+         self.displayBoard()
       """should pass a player object to this so that
          it can extract what token to use nicely!"""
    
@@ -35,6 +41,7 @@ class gameboard(object):
             + " | " + self.board[6][i] + " |")
          except IndexError:
             print("Oh gosh, something went wrong with my index!")
+      print("\n")
 
    def hCheck(self):
    #it goes board[column[row]]
@@ -87,21 +94,30 @@ class gameboard(object):
                   if hit == 3:
                      return True
       return False
+      
+   def validMove(self, move):
+      if self.rowCount[move] > 5:
+         print("invalid move, column full")
+         return 0
+      else:
+         self.rowCount[move] += 1
+         return 1
 
-   def checkWinstate(self):
+   def checkWinstate(self, player):
       if self.hCheck() == True:
-         print("Winner")
+         print(player.getType)
+         print("Winner by horizontal!")
          return True
       elif self.vCheck() == True:
-         print("Winner")
+         print(player.getType)
+         print("Winner by vertical!")
          return True
       elif self.dCheck() == True:
-         print("Winner")
+         print(player.getType)
+         print("Winner by diagonal!")
          return True
       else:
          return False
-         
-
 
    def printMove(self):
       print(self.moveNumber)
@@ -124,18 +140,37 @@ class gameboard(object):
             
 class player(object):
 
-   def __init__(self, token):
+   def __init__(self, token, type):
       self.token = str(token)
       self.currentMove = ''
+      self.type = type
+      if self.type == "ai":
+         self.difficulty = int(input("Difficulty 1-3: "))
+      else:
+         self.difficulty = 0
 
-   def humanTurn(self):
-      self.currentMove = int(input("Play a column...... "))
-      return self.currentMove-1 #because index
+   def Turn(self):
+      if self.type == "ai":
+         if self.difficulty == 1:
+            self.currentMove = random.randint(1,7)
+            return self.currentMove-1 #because index
+         elif self.difficulty == 2:
+            print("TODO: Implement minimax search")
+         elif self.difficulty == 3:
+            print("TODO: Implement minimax search")
+         else:
+            print("Wrong input.")
+            
+      else:
+         #for the human player from stdin
+         self.currentMove = int(input("Play a column...... "))
+         return self.currentMove-1 #because index
    
    def getToken(self):
       return self.token
 
-
+   def getType(self):
+      return self.type
 
 
 

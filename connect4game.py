@@ -7,24 +7,22 @@ class game(object):
       
       self.currentBoard = gameboard()
       self.winState = True
-      self.player1 = player("x")
-      self.player2 = player("o")
+      self.player1 = player("x", "human")
+      self.player2 = player("o", "ai")
       self.currentBoard.displayBoard()
       
    def play(self):
       while self.winState:
-         self.currentBoard.updateBoard(self.player1.humanTurn(),
+         self.currentBoard.updateBoard(self.player1.Turn(),
                                        self.player1)
-         print(self.winState)
-         if self.currentBoard.checkWinstate() == True:
+         if self.currentBoard.checkWinstate(self.player1) == True:
             self.winState = False
             break
          else:
-            self.currentBoard.updateBoard(self.player2.humanTurn(),
+            self.currentBoard.updateBoard(self.player2.Turn(),
                                        self.player2)
-            print(self.winState)
-            if self.currentBoard.checkWinstate() == True:
+            if self.currentBoard.checkWinstate(self.player2) == True:
                self.winState = False
                break
          
-      return 0  
+      return 0

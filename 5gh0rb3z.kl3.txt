@@ -1,0 +1,13 @@
+﻿added some stuff
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	new file:   __pycache__/connect4game.cpython-35.pyc
+#	new file:   __pycache__/dank.cpython-35.pyc
+#	modified:   connect4game.py
+#	modified:   dank.py
+#
+
