@@ -88,8 +88,8 @@ class gameboard(object):
          for j in range(0,4):
             hit = 0
             for k in reversed(range(1,4)):
-               if self.board[j+k][i] != ' ' and self.board[j][i+k] != ' ':
-                  if self.board[j+k][i] == self.board[j][i+k]:
+               if self.board[j][i+3] != ' ' and self.board[j+k][i+3-k] != ' ':
+                  if self.board[j][i+3] == self.board[j+k][i+3-k]:
                      hit += 1
                   if hit == 3:
                      return True
@@ -105,15 +105,15 @@ class gameboard(object):
 
    def checkWinstate(self, player):
       if self.hCheck() == True:
-         print(player.getType)
+         print(player.getType())
          print("Winner by horizontal!")
          return True
       elif self.vCheck() == True:
-         print(player.getType)
+         print(player.getType())
          print("Winner by vertical!")
          return True
       elif self.dCheck() == True:
-         print(player.getType)
+         print(player.getType())
          print("Winner by diagonal!")
          return True
       else:
