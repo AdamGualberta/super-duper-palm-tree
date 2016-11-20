@@ -157,6 +157,7 @@ class player(object):
          elif self.difficulty == 2:
             print("TODO: Implement minimax search")
          elif self.difficulty == 3:
+            #self.currentMove = minimax.nextMove()
             print("TODO: Implement minimax search")
          else:
             print("Wrong input.")
@@ -171,22 +172,3 @@ class player(object):
 
    def getType(self):
       return self.type
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
