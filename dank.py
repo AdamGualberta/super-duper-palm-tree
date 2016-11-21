@@ -54,56 +54,93 @@ class gameboard(object):
                 print("Oh gosh, something went wrong with my index!")
         print("\n")
     #the following checks systematically check all possible win states. Not elegant but works.
-    def hCheck(self):
-    #it goes board[column][row]
+        
+    def hCheck(self, player):
+        player.newScore("h", [])
+        #it goes board[column][row]
         for i in range(0,6):
-            for j in range(0,4):
-                hit = 0
-                for k in range(1,4):
-                    if self.board[j][i] != ' ' and self.board[j+k][i] != ' ':
-                        if self.board[j][i] == self.board[j+k][i]:
-                            hit += 1
-                        if hit == 3:
-                            return True
+            hit = 0
+            for j in range(0,6):
+                if self.board[j][i] == player.getToken():
+                    if self.board[j][i] == self.board[j+1][i]:
+                        print("hit")
+                        hit += 1
+                    if hit == 3:
+                        return True
+                else:
+                    if hit > 0:
+                        player.setScore("h",hit)
+                    hit = 0
+            if hit > 0:
+                player.setScore("h", hit)
+        print(player.getToken())
+        print(player.getScore("h"))
         return False
-
-    def vCheck(self):
-    #it goes board[column][row]
+        
+    def vCheck(self, player):
+        player.newScore("v", [])
+        #it goes board[column][row]
         for i in range(0,7):
-            for j in range(0,3):
-                hit = 0
-                for k in range(1,4):
-                    if self.board[i][j] != ' ' and self.board[i][j+k] != ' ':
-                        if self.board[i][j] == self.board[i][j+k]:
-                            hit += 1
-                        if hit == 3:
-                            return True
+            hit = 0
+            for j in range(0,5):
+                if self.board[i][j] == player.getToken():
+                    if self.board[i][j] == self.board[i][j+1]:
+                        print("hit")
+                        hit += 1
+                    if hit == 3:
+                        return True
+                else:
+                    if hit > 0:
+                        player.setScore("v",hit)
+                    hit = 0
+            if hit > 0:
+                player.setScore("v", hit)
+        print(player.getToken())
+        print(player.getScore("v"))
         return False
-
-    def dCheck(self):
-    #it goes board[column][row]
+    
+    def dCheck(self, player):
+        player.newScore("d", [])
+        #it goes board[column][row]
         #left diagonal
         for i in range(0,3):
+            hit = 0
             for j in range(0,4):
-                hit = 0
-                for k in range(1,4):
-                    if self.board[j][i] != ' ' and self.board[j+k][i+k] != ' ':
-                        if self.board[j][i] == self.board[j+k][i+k]:
+                hit = 0 
+                for k in range(0,3):
+                    if self.board[j+k][i+k] == player.getToken():
+                        if self.board[j+k][i+k] == self.board[j+k+1][i+k+1]:
                             hit += 1
                         if hit == 3:
                             return True
+                    else:
+                        if hit > 0:
+                            player.setScore("d", hit)
+                        hit = 0
+            if hit > 0:
+                player.setScore("d",hit)
     #it goes board[column][row]
         #right diagonal
         for i in range(0,3):
+            hit = 0
             for j in range(0,4):
-                hit = 0
-                for k in reversed(range(1,4)):
-                    if self.board[j][i+3] != ' ' and self.board[j+k][i+3-k] != ' ':
-                        if self.board[j][i+3] == self.board[j+k][i+3-k]:
+                hit = 0 
+                for k in reversed(range(0,3)):
+                    if self.board[j+2-k][i+k+1] == player.getToken():
+                        if self.board[j+2-k][i+k+1] == self.board[j+3-k][i+k]:
                             hit += 1
                         if hit == 3:
                             return True
+                    else:
+                        if hit > 0:
+                            player.setScore("d", hit)
+                        hit = 0
+            if hit > 0:
+                player.setScore("d",hit)
         return False
+        
+    #def hValue(self):
+        
       
     def validMove(self, move):
         #handles checking of out of bounds moves
@@ -116,15 +153,15 @@ class gameboard(object):
 
     def checkWinstate(self, player):
         #uses check methods to see if the current board has a win state
-        if self.hCheck() == True:
+        if self.hCheck(player) == True:
             print(player.getType())
             print("Winner by horizontal!")
             return True
-        elif self.vCheck() == True:
+        elif self.vCheck(player) == True:
             print(player.getType())
             print("Winner by vertical!")
             return True
-        elif self.dCheck() == True:
+        elif self.dCheck(player) == True:
             print(player.getType())
             print("Winner by diagonal!")
             return True
@@ -156,6 +193,9 @@ class gameboard(object):
 class player(object):
 
     def __init__(self, token, type):
+        self.diagonalScore = []
+        self.horizontalScore = []
+        self.verticalScore = []
         self.token = str(token)
         self.currentMove = ''
         self.type = type #human, monkey, dog, ai, etc.
@@ -185,6 +225,30 @@ class player(object):
             #for the human player from stdin
             self.currentMove = int(input("Play a column...... "))
             return self.currentMove-1 #because index
+            
+    def newScore(self, direction, scorelist):
+        if direction == "h":
+            self.horizontalScore = scorelist
+        elif direction == "v":
+            self.verticalScore = scorelist
+        elif direction == "d":
+            self.diagonalScore = scorelist
+   
+    def setScore(self, direction, score):
+        if direction == "h":
+            self.horizontalScore.append(score)
+        elif direction == "v":
+            self.verticalScore.append(score)
+        elif direction == "d":
+            self.diagonalScore.append(score)
+            
+    def getScore(self, direction):
+        if direction == "h":
+            return self.horizontalScore
+        elif direction == "v":
+            return self.verticalScore
+        elif direction == "d":
+            return self.diagonalScore
    
     def getToken(self):
         #returns teh symbol that the player is using
