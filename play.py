@@ -5,10 +5,10 @@
 from connect4game import *
 
 def main():
-   #create new game
-   g = game()
-   #play the game! see connect4game.py
-   g.play()
-   return 0#exit nicely
+    #create new game
+    g = game()
+    #play the game! see connect4game.py
+    g.play()
+    return 0#exit nicely
    
 main()

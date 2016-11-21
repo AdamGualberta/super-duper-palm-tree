@@ -122,7 +122,7 @@ class minimax(object):
             my_four=self.streak(s,c,4)
             my_three=self.streak(s,c,3)
             my_two=self.streak(s,c,2)
-            opp_four=self.strea(s,o.color,4)
+            opp_four=self.streak(s,o.color,4)
             
             if (opp_four>0):
                 return -1000000
