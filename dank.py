@@ -55,7 +55,8 @@ class gameboard(object):
                 if self.board[move][i] == ' ':
                     self.board[move][i] = player.getToken()#places player symbol on board
                     break
-   
+            self.displayBoard()
+            
     def displayBoard(self):
         for i in reversed(range(0,6)):
             try:
@@ -86,8 +87,8 @@ class gameboard(object):
                     hit = 0
             if hit > 0:
                 player.setScore("h", hit)
-        print(player.getToken())
-        print(player.getScore("h"))
+        #print(player.getToken())
+        #print(player.getScore("h"))
         return False
         
     def vCheck(self, player):
@@ -107,8 +108,8 @@ class gameboard(object):
                     hit = 0
             if hit > 0:
                 player.setScore("v", hit)
-        print(player.getToken())
-        print(player.getScore("v"))
+        #print(player.getToken())
+        #print(player.getScore("v"))
         return False
         
     def dCheck(self, player):
@@ -139,8 +140,8 @@ class gameboard(object):
                             return True
                 if hit > 0:
                     player.setScore("d",hit)
-        print(player.getToken())
-        print(player.getScore("d"))
+        #print(player.getToken())
+        #print(player.getScore("d"))
         return False
 
     def validMove(self, move):
@@ -154,16 +155,16 @@ class gameboard(object):
     def checkWinstate(self, player):
         #uses check methods to see if the current board has a win state
         if self.hCheck(player) == True:
-            print(player.getType())
-            print("Winner by horizontal!")
+            #print(player.getType())
+            #print("Winner by horizontal!")
             return True
         elif self.vCheck(player) == True:
-            print(player.getType())
-            print("Winner by vertical!")
+            #print(player.getType())
+            #print("Winner by vertical!")
             return True
         elif self.dCheck(player) == True:
-            print(player.getType())
-            print("Winner by diagonal!")
+            #print(player.getType())
+            #print("Winner by diagonal!")
             return True
         else:
             return False
@@ -201,7 +202,7 @@ class player(object):
         self.currentMove = ''
         self.type = type #human, monkey, dog, ai, etc.
         if self.type == "ai":
-            self.difficulty = int(input("Difficulty 1-3: "))
+            self.difficulty = int(input("Difficulty 1-2: "))
             if self.difficulty == 2:
                 self.depth = int(input("Depth for bot pls: "))
             #1 is random
@@ -295,23 +296,23 @@ class minimax(object):
         """
         
         # enumerate all legal moves from this state
-        self.player = self.players[dank]
+        player = self.players[dank]
         legal_moves = []
         for i in range(0,7):
             # if column i is a legal move...
-            print(i)
+            #print(i)
             if state.validMove(i):
                 # make the move in column i for curr_player
                 #temp = self.makeMove(state, i, curr_player)
-                self.tempstate = state
-                self.tempstate.qUpdateBoard(i,self.player)
-                self.tempstate.checkWinstate(self.player)
-                legal_moves.append(self.tempstate)
+                tempstate = state
+                tempstate.qUpdateBoard(i,player)
+                tempstate.checkWinstate(player)
+                legal_moves.append(tempstate)
         
         # if this node (state) is a terminal node or depth == 0...
         if depth == 0 or len(legal_moves) == 0:
             # return the heuristic value of node
-            print("gg")
+            #print("gg")
             return self.value(state, dank)
         
         # determine opponent's color
@@ -340,9 +341,11 @@ class minimax(object):
         else:
             n = 1
             m = 0
-        state.checkWinstate(self.players[n])
-        state.checkWinstate(self.players[m])
-        print(self.players[n].getScore("all"))
+        curr=self.players[n]
+        opp=self.players[m]
+        state.checkWinstate(curr)
+        state.checkWinstate(opp)
+        #print(self.players[n].getScore("all"))
         my_fours = self.players[n].getScore("all").count(3)
         my_threes = self.players[n].getScore("all").count(2)
         my_twos = self.players[n].getScore("all").count(1)
@@ -369,7 +372,7 @@ class minimax(object):
         legal_moves = {} # will map legal move states to their alpha values
         for i in range(0,7):
             # if column i is a legal move...
-            print("  " + str(i))
+            #print("  " + str(i))
             if state.validMove(i):
                 # make the move in column i for curr_player
                 #temp = self.makeMove(state, i, curr_player)
