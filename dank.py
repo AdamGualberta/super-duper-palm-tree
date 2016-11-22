@@ -37,11 +37,24 @@ class gameboard(object):
             #moveNumber here for fun, doesn't do anything atm
             self.moveNumber += 1
             for i in range(0,6):
-                #loops until it finds the height of the column TODO use rowCount here
+                #loops until it finds the height of the column
                 if self.board[move][i] == ' ':
                     self.board[move][i] = player.getToken()#places player symbol on board
                     break
             self.displayBoard()
+            
+    def qUpdateBoard(self,move,player): #moves with no display shown
+        #first check to see if the move will go out of bounds
+        if self.validMove(move) == 0:
+            #if not good it will display board again and prompt player to try again
+            print("Move error")
+        else:
+            #moveNumber here for fun, doesn't do anything atm
+            for i in range(0,6):
+                #loops until it finds the height of the column
+                if self.board[move][i] == ' ':
+                    self.board[move][i] = player.getToken()#places player symbol on board
+                    break
    
     def displayBoard(self):
         for i in reversed(range(0,6)):
@@ -130,16 +143,12 @@ class gameboard(object):
         print(player.getScore("d"))
         return False
 
-    #def hValue(self):
-        
-      
     def validMove(self, move):
         #handles checking of out of bounds moves
-        if self.rowCount[move] > 5:
+        if len(self.board[move]) > 6:
             print("invalid move, column full")
             return 0
         else:
-            self.rowCount[move] += 1
             return 1
 
     def checkWinstate(self, player):
@@ -158,10 +167,9 @@ class gameboard(object):
             return True
         else:
             return False
-
-    def printMove(self):
-        #debug stuff
-        print(self.moveNumber)
+            
+    def getBoard(self):
+        return self.board
 
     def printRow(self, row):
         #debug stuff
@@ -184,6 +192,8 @@ class gameboard(object):
 class player(object):
 
     def __init__(self, token, type):
+        self.heuristics = 0
+        self.depth = 0
         self.diagonalScore = []
         self.horizontalScore = []
         self.verticalScore = []
@@ -192,20 +202,23 @@ class player(object):
         self.type = type #human, monkey, dog, ai, etc.
         if self.type == "ai":
             self.difficulty = int(input("Difficulty 1-3: "))
+            if self.difficulty == 2:
+                self.depth = int(input("Depth for bot pls: "))
             #1 is random
             #2 TODO is minimax with low depth (or custom maybe)
             #3 TODO is minimax max depth infinite time and resources
         else:
             self.difficulty = 0 #redundant
 
-    def Turn(self):
+    def Turn(self, gameboard, AI):
         #handles both human and ai turns depending on player type.
         if self.type == "ai":
             if self.difficulty == 1:
                 self.currentMove = random.randint(1,7)
                 return self.currentMove-1 #because index
             elif self.difficulty == 2:
-                print("TODO: Implement minimax search")
+                self.currentMove = AI.bestMove(self.depth, gameboard, self.playerNum)
+                return self.currentMove-1
             elif self.difficulty == 3:
                 #self.currentMove = minimax.nextMove()
                 print("TODO: Implement minimax search")
@@ -217,6 +230,9 @@ class player(object):
             self.currentMove = int(input("Play a column...... "))
             return self.currentMove-1 #because index
             
+    def setPlayerNum(self, number):
+        self.playerNum = number
+
     def newScore(self, direction, scorelist):
         if direction == "h":
             self.horizontalScore = scorelist
@@ -240,6 +256,11 @@ class player(object):
             return self.verticalScore
         elif direction == "d":
             return self.diagonalScore
+        elif direction == "all":
+            temp = self.horizontalScore
+            temp.extend(self.verticalScore)
+            temp.extend(self.diagonalScore)
+            return temp
    
     def getToken(self):
         #returns teh symbol that the player is using
@@ -251,19 +272,122 @@ class player(object):
       
     def getDifficulty(self):
         return self.difficulty
+        
+    def setHeuristics(self, value):
+        self.heuristics = value
+        
+    def getHeuristics(self):
+        return self.heuristics
       
-class ai():
+class minimax(object):
 
-    def randomMove(self):
-        return random.randint(1,7)
+    def __init__(self, currBoard, currPlayer1, currPlayer2):
+        self.board = currBoard #type gameboard
+        self.players = [currPlayer1,currPlayer2]
+
+    def search(self, depth, state, dank):
+        #dank is player number
+        """ Searches the tree at depth 'depth'
+            By default, the state is the board, and dank is whomever 
+            called this search
+            
+            Returns the alpha value
+        """
+        
+        # enumerate all legal moves from this state
+        self.player = self.players[dank]
+        legal_moves = []
+        for i in range(0,7):
+            # if column i is a legal move...
+            print(i)
+            if state.validMove(i):
+                # make the move in column i for curr_player
+                #temp = self.makeMove(state, i, curr_player)
+                self.tempstate = state
+                self.tempstate.qUpdateBoard(i,self.player)
+                self.tempstate.checkWinstate(self.player)
+                legal_moves.append(self.tempstate)
+        
+        # if this node (state) is a terminal node or depth == 0...
+        if depth == 0 or len(legal_moves) == 0:
+            # return the heuristic value of node
+            print("gg")
+            return self.value(state, dank)
+        
+        # determine opponent's color
+
+        alpha = -99999999
+        for child in legal_moves:
+            if child == None:
+                print("child == None (search)")
+            if dank == 0:
+                rank = 1
+            else:
+                rank = 0
+            alpha = max(alpha, -self.search(depth-1, child, rank))
+        return alpha
    
+    def value(self, state, dank):
+        #gets board heuristic data for current player
+        """ Simple heuristic to evaluate board configurations
+            Heuristic is (num of 4-in-a-rows)*99999 + (num of 3-in-a-rows)*100 + 
+            (num of 2-in-a-rows)*10 - (num of opponent 4-in-a-rows)*99999 - (num of opponent
+            3-in-a-rows)*100 - (num of opponent 2-in-a-rows)*10
+        """
+        if dank == 0:
+            n = 0
+            m = 1
+        else:
+            n = 1
+            m = 0
+        state.checkWinstate(self.players[n])
+        state.checkWinstate(self.players[m])
+        print(self.players[n].getScore("all"))
+        my_fours = self.players[n].getScore("all").count(3)
+        my_threes = self.players[n].getScore("all").count(2)
+        my_twos = self.players[n].getScore("all").count(1)
+        opp_fours = self.players[m].getScore("all").count(3)
+        #opp_threes = self.checkForStreak(state, o_color, 3)
+        #opp_twos = self.checkForStreak(state, o_color, 2)
+        if opp_fours > 0:
+            return -100000
+        else:
+            return my_fours*100000 + my_threes*100 + my_twos
    
-   
-   
-   
-   
-   
-   
+    def bestMove(self, depth, state, dank):
+        """ Returns the best move (as a column number) and the associated alpha
+            Calls search()
+        """
+        if dank == 0:
+            rank = 1
+        else:
+            rank = 0
+                
+        # enumerate all legal moves
+                
+        self.player = self.players[dank]
+        legal_moves = {} # will map legal move states to their alpha values
+        for i in range(0,7):
+            # if column i is a legal move...
+            print("  " + str(i))
+            if state.validMove(i):
+                # make the move in column i for curr_player
+                #temp = self.makeMove(state, i, curr_player)
+                temp = state
+                temp.qUpdateBoard(i,self.player)
+                legal_moves[i] = -self.search(depth-1, temp, rank)
+        
+        best_alpha = -99999999
+        best_move = None
+        moves = legal_moves.items()
+        random.shuffle(list(moves))
+        for move, alpha in moves:
+            if alpha >= best_alpha:
+                best_alpha = alpha
+                best_move = move
+        
+        #return best_move, best_alpha
+        return best_move
    
    
    
