@@ -39,10 +39,10 @@ class game(object):
                 break
             else:
                 print(self.player2.getType())
-                if self.player2.getType() == "ai":
+                if self.player2.getDifficulty() == 2:
                     print("AI Battle")
                     tempBoard = self.currentBoard
-                    m = minimax(tempBoard, self.player1, self.player2)
+                    m = minimax(self.player1, self.player2)
                     self.currentBoard.updateBoard(self.player2.Turn(tempBoard, m),
                                                                 self.player2)
                 else:

@@ -20,7 +20,6 @@ class gameboard(object):
                      [' ',' ',' ',' ',' ',' '],
                      [' ',' ',' ',' ',' ',' '],
                      [' ',' ',' ',' ',' ',' ']]
-        self.moveNumber = 0
         #rowCount keeps track of height of columns to keep in bounds
         self.rowCount = [0,0,0,0,0,0,0]
         """gameboard board is stored here in the form of a list of lists.
@@ -31,16 +30,17 @@ class gameboard(object):
         #first check to see if the move will go out of bounds
         if self.validMove(move) == 0:
             self.displayBoard()
+            print("invalid move")
             #if not good it will display board again and prompt player to try again
             self.updateBoard(player.Turn(),player)
         else:
-            #moveNumber here for fun, doesn't do anything atm
-            self.moveNumber += 1
             for i in range(0,6):
                 #loops until it finds the height of the column
                 if self.board[move][i] == ' ':
                     self.board[move][i] = player.getToken()#places player symbol on board
                     break
+                if i == 5:
+                    print("Board full!")
             self.displayBoard()
             
     def qUpdateBoard(self,move,player): #moves with no display shown
@@ -55,7 +55,7 @@ class gameboard(object):
                 if self.board[move][i] == ' ':
                     self.board[move][i] = player.getToken()#places player symbol on board
                     break
-            self.displayBoard()
+            #self.displayBoard()
             
     def displayBoard(self):
         for i in reversed(range(0,6)):
@@ -219,6 +219,7 @@ class player(object):
                 return self.currentMove-1 #because index
             elif self.difficulty == 2:
                 self.currentMove = AI.bestMove(self.depth, gameboard, self.playerNum)
+                print(self.currentMove)
                 return self.currentMove-1
             elif self.difficulty == 3:
                 #self.currentMove = minimax.nextMove()
@@ -279,11 +280,12 @@ class player(object):
         
     def getHeuristics(self):
         return self.heuristics
-      
+
+        
+#below is adapted from https://github.com/erikackermann/Connect-Four/blob/master/minimax.py
 class minimax(object):
 
-    def __init__(self, currBoard, currPlayer1, currPlayer2):
-        self.board = currBoard #type gameboard
+    def __init__(self, currPlayer1, currPlayer2):
         self.players = [currPlayer1,currPlayer2]
 
     def search(self, depth, state, dank):
@@ -302,8 +304,6 @@ class minimax(object):
             # if column i is a legal move...
             #print(i)
             if state.validMove(i):
-                # make the move in column i for curr_player
-                #temp = self.makeMove(state, i, curr_player)
                 tempstate = state
                 tempstate.qUpdateBoard(i,player)
                 tempstate.checkWinstate(player)
@@ -368,7 +368,7 @@ class minimax(object):
                 
         # enumerate all legal moves
                 
-        self.player = self.players[dank]
+        player = self.players[dank]
         legal_moves = {} # will map legal move states to their alpha values
         for i in range(0,7):
             # if column i is a legal move...
@@ -377,7 +377,7 @@ class minimax(object):
                 # make the move in column i for curr_player
                 #temp = self.makeMove(state, i, curr_player)
                 temp = state
-                temp.qUpdateBoard(i,self.player)
+                temp.qUpdateBoard(i,player)
                 legal_moves[i] = -self.search(depth-1, temp, rank)
         
         best_alpha = -99999999
