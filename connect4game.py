@@ -13,7 +13,7 @@ class game(object):
         self.winState = True
         #setting players hardcoded, future maybe have as input
         self.player1 = player("x", "human")
-        self.player2 = player("o", "bob")
+        self.player2 = player("o", "ai")
         #display the empty board, also good check to see if all is well.
         self.currentBoard.displayBoard()
       

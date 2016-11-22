@@ -53,6 +53,7 @@ class gameboard(object):
             except IndexError:
                 print("Oh gosh, something went wrong with my index!")
         print("\n")
+        
     #the following checks systematically check all possible win states. Not elegant but works.
         
     def hCheck(self, player):
@@ -63,7 +64,6 @@ class gameboard(object):
             for j in range(0,6):
                 if self.board[j][i] == player.getToken():
                     if self.board[j][i] == self.board[j+1][i]:
-                        print("hit")
                         hit += 1
                     if hit == 3:
                         return True
@@ -85,7 +85,6 @@ class gameboard(object):
             for j in range(0,5):
                 if self.board[i][j] == player.getToken():
                     if self.board[i][j] == self.board[i][j+1]:
-                        print("hit")
                         hit += 1
                     if hit == 3:
                         return True
@@ -98,47 +97,39 @@ class gameboard(object):
         print(player.getToken())
         print(player.getScore("v"))
         return False
-    
+        
     def dCheck(self, player):
         player.newScore("d", [])
         #it goes board[column][row]
-        #left diagonal
-        for i in range(0,3):
-            hit = 0
+        #neg slope
+        for i in reversed(range(0,3)):
             for j in range(0,4):
-                hit = 0 
+                hit = 0
                 for k in range(0,3):
                     if self.board[j+k][i+k] == player.getToken():
                         if self.board[j+k][i+k] == self.board[j+k+1][i+k+1]:
                             hit += 1
                         if hit == 3:
                             return True
-                    else:
-                        if hit > 0:
-                            player.setScore("d", hit)
-                        hit = 0
-            if hit > 0:
-                player.setScore("d",hit)
-    #it goes board[column][row]
-        #right diagonal
-        for i in range(0,3):
-            hit = 0
-            for j in range(0,4):
+                if hit > 0:
+                    player.setScore("d",hit)
+        #it goes board[column][row]
+        #pos slope
+        for i in reversed(range(3,6)):
+            for j in reversed(range(0,4)):
                 hit = 0 
-                for k in reversed(range(0,3)):
-                    if self.board[j+2-k][i+k+1] == player.getToken():
-                        if self.board[j+2-k][i+k+1] == self.board[j+3-k][i+k]:
+                for k in range(0,3):
+                    if self.board[j-k][i-k] == player.getToken():
+                        if self.board[j-k][i-k] == self.board[j-k+1][i-k-1]:
                             hit += 1
                         if hit == 3:
                             return True
-                    else:
-                        if hit > 0:
-                            player.setScore("d", hit)
-                        hit = 0
-            if hit > 0:
-                player.setScore("d",hit)
+                if hit > 0:
+                    player.setScore("d",hit)
+        print(player.getToken())
+        print(player.getScore("d"))
         return False
-        
+
     #def hValue(self):
         
       
